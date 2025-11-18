@@ -40,31 +40,94 @@
 
 ## Option 2: Render.com
 
-**Time: ~2-3 minutes**
+**Time: ~3-5 minutes**
+
+### Prerequisites:
+- GitHub account with your code pushed
+- Render account (free at render.com)
 
 ### Steps:
+
+#### **Method A: Automatic (using render.yaml) ⭐ Recommended**
+
+1. **Push to GitHub**
+   ```bash
+   cd c:\Users\selvi\Downloads\image
+   git add .
+   git commit -m "Deploy to Render"
+   git push origin main
+   ```
+
+2. **Deploy on Render**
+   - Go to [dashboard.render.com](https://dashboard.render.com)
+   - Click **"New +"** → **"Blueprint"**
+   - Connect your GitHub repository
+   - Render auto-detects `render.yaml`
+   - Click **"Apply"**
+   - Wait 5-8 minutes for build
+
+3. **Verify**
+   - Your app will be at: `https://image-similarity.onrender.com`
+   - Test the health endpoint: `/health`
+
+#### **Method B: Manual Configuration**
 
 1. **Create Render Account**
    - Go to [render.com](https://render.com)
    - Sign up with GitHub
 
 2. **Create New Service**
-   - Dashboard → New → Web Service
+   - Dashboard → **New +** → **Web Service**
    - Connect GitHub repository
-   - Select branch (main)
+   - Select branch: `main`
 
-3. **Configure**
-   - **Environment**: Python 3.11
-   - **Build Command**: `pip install -r requirements.txt && pip install gunicorn`
-   - **Start Command**: `gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 60 app:app`
-   - **Plan**: Free
+3. **Configure Service**
+   - **Name**: `image-similarity-analyzer`
+   - **Region**: Choose closest to you
+   - **Runtime**: `Python 3`
+   - **Build Command**: 
+     ```bash
+     pip install --upgrade pip setuptools wheel && pip install -r requirements.txt
+     ```
+   - **Start Command**: 
+     ```bash
+     gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --access-logfile - --error-logfile - app:app
+     ```
+   - **Instance Type**: `Free`
 
-4. **Deploy**
-   - Click "Create Web Service"
-   - Wait for build (~2 minutes)
+4. **Environment Variables** (Manual method only)
+   - `PYTHON_VERSION` = `3.11.6`
+   - `PYTHONUNBUFFERED` = `1`
+
+5. **Deploy**
+   - Click **"Create Web Service"**
+   - Wait for build (5-8 minutes)
    - Get URL from dashboard
 
-### Cost: **FREE** (with limitations)
+### Important Files:
+- ✅ `render.yaml` - Auto-configuration
+- ✅ `.python-version` - Forces Python 3.11.6
+- ✅ `apt-packages` - System dependencies for OpenCV
+- ✅ `requirements.txt` - Uses `opencv-python-headless` (required for servers)
+
+### Troubleshooting:
+
+**Build Fails with "Cannot import setuptools"**
+- ✅ Fixed: `requirements.txt` now includes `setuptools` and `wheel`
+
+**Port Binding Error**
+- ✅ Fixed: Using `$PORT` environment variable (Render assigns dynamically)
+
+**OpenCV Import Error**
+- ✅ Fixed: Using `opencv-python-headless` and `apt-packages` for system libs
+
+**Python Version Mismatch**
+- ✅ Fixed: `.python-version` forces Python 3.11.6
+
+### Cost: **FREE** 
+- ⚠️ Spins down after 15 min inactivity
+- ⚠️ 750 hours/month free
+- ⚠️ First request after sleep: ~30 seconds
 
 ---
 

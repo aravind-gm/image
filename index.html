@@ -497,13 +497,35 @@
         }
 
         .score-value {
-            font-size: 3.5em;
+            font-size: 4em;
             font-weight: 900;
             font-family: 'Orbitron', sans-serif;
             background: linear-gradient(135deg, #667eea, #8b5cf6, #ec4899);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+        }
+        
+        .score-value.match-yes {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .score-value.match-no {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .binary-result {
+            font-size: 2em;
+            font-weight: 700;
+            color: #a78bfa;
+            margin-top: 10px;
+            font-family: 'Orbitron', sans-serif;
         }
 
         .score-label {
@@ -827,8 +849,9 @@
             <div class="similarity-score">
                 <div class="score-circle">
                     <div class="score-inner">
-                        <div class="score-value" id="scoreValue">0%</div>
-                        <div class="score-label">Match</div>
+                        <div class="score-value" id="scoreValue">-</div>
+                        <div class="binary-result" id="binaryValue">-</div>
+                        <div class="score-label">Match Result</div>
                     </div>
                 </div>
             </div>
@@ -1002,8 +1025,25 @@
             const hist = (data.histogram * 100).toFixed(1);
             const ssim = (data.ssim * 100).toFixed(1);
             const sift = (data.sift * 100).toFixed(1);
+            
+            // Display binary results
+            const matchText = data.match; // "Yes" or "No"
+            const binaryValue = data.binary; // 0 or 1
+            const scoreValueEl = document.getElementById('scoreValue');
+            const binaryValueEl = document.getElementById('binaryValue');
+            
+            // Set text and styling
+            scoreValueEl.textContent = matchText;
+            binaryValueEl.textContent = binaryValue;
+            
+            // Add color class
+            scoreValueEl.classList.remove('match-yes', 'match-no');
+            if (matchText === 'Yes') {
+                scoreValueEl.classList.add('match-yes');
+            } else {
+                scoreValueEl.classList.add('match-no');
+            }
 
-            animateValue('scoreValue', sim + '%');
             animateValue('histogramValue', hist + '%');
             animateValue('ssimValue', ssim + '%');
             animateValue('siftValue', sift + '%');

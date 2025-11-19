@@ -156,7 +156,7 @@ def compare_images(img1_path, img2_path):
     """
     Main comparison function combining all three algorithms
     Weighted average: 40% histogram, 30% SSIM, 30% SIFT
-    Returns: 0-1 similarity score
+    Returns: Binary classification (0/1, Yes/No) with threshold at 70%
     """
     try:
         # Load images
@@ -181,8 +181,16 @@ def compare_images(img1_path, img2_path):
             0.30 * sift_score
         )
         
+        # Binary classification with 70% threshold
+        SIMILARITY_THRESHOLD = 0.70
+        is_similar = final_score >= SIMILARITY_THRESHOLD
+        binary_result = 1 if is_similar else 0
+        text_result = "Yes" if is_similar else "No"
+        
         return {
             'similarity': float(np.clip(final_score, 0, 1)),
+            'binary': binary_result,
+            'match': text_result,
             'histogram': float(np.clip(histogram_score, 0, 1)),
             'ssim': float(np.clip(ssim_score, 0, 1)),
             'sift': float(np.clip(sift_score, 0, 1))
